@@ -204,7 +204,6 @@ export default {
         },
         numberBoxX() {
             var ret = this.pos.x + (this.width - this.numberboxwidth)/2;
-            console.log(ret, this.pos.x, this.width, this.numberboxwidth);
             return ret;
         },
         numberBoxY() {
