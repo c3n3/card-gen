@@ -6,10 +6,13 @@
         <img :src="suitimage" :width="mmToPx(this.suitWidth)" :height="mmToPx(this.suitWidth)" class="suit" :style="topSuitStyle()"/>
         <img :src="suitimage" :width="mmToPx(this.suitWidth)" :height="mmToPx(this.suitWidth)" class="suit" :style="bottomSuitStyle()"/>
         <img :src="backimage" :width="mmToPx(this.width)" :height="mmToPx(this.height)" :style="backimageStyle()"/>
+        <Numbers :x="numberBoxX()" :y="numberBoxY()" :suitimage="suitimage" :number="value" :width="numberboxwidth" :height="numberboxheight" :imagewidth="this.suitWidth * this.numberscale"></Numbers>
     </div>
 </template>
 <style scoped>
-
+.card {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
 .card :hover {
     cursor: pointer;
 }
@@ -26,16 +29,40 @@
 <script>
 
 let uid = 0;
+import Numbers from './Numbers.vue'
 
 import { defineComponent } from 'vue'
 
 import * as htmlToImage from 'html-to-image';
 import * as download from 'downloadjs';
 
-
 export default {
     name: 'Card',
-    props: ['value', 'color', 'height', 'width', 'suitimage', 'backimage', 'suitoffsetx', 'suitoffsety', "letteroffsetx", "letteroffsety", "letterheight"],
+    components: {
+        Numbers
+    },
+    props: [
+        'value',
+        'color',
+        'height',
+        'width',
+        'suitimage',
+        'backimage',
+        'suitoffsetx',
+        'suitoffsety',
+        "letteroffsetx",
+        "letteroffsety",
+        "letterheight",
+
+        // For cards 2 - 10
+        "numberboxwidth",
+        "numberboxheight",
+        "numberxspread",
+        "numberyspread",
+        "numberscale",
+
+        "acescale",
+    ],
     data() {
         return {
             scale: 1.0294,
@@ -53,11 +80,9 @@ export default {
         },
         download() {
             var self = this;
-            console.log(this.getAbsPos())
             htmlToImage.toPng(document.getElementById('card-' + this.unique),
                 { 'canvasWidth': this.mmToPx(this.width), 'canvasHeight': this.mmToPx(this.height) })
                 .then(function (dataUrl) {
-                    console.log(dataUrl);
                     (download)(dataUrl, 'card-' + '-' + self.unique + '-' + '.png');
                 })
                 .catch(function (error) {
@@ -102,7 +127,6 @@ export default {
         },
         backimageStyle() {
             if (this.pos) {
-                console.log(this.pos.y, this.suitoffsetx, this.pos.y + this.suitoffsetx)
                 var ret = `
                     position: absolute;
                     top: ${this.pos.y}mm;
@@ -115,7 +139,6 @@ export default {
         },
         topSuitStyle() {
             if (this.pos && this.suitoffsetx && this.suitoffsety) {
-                console.log(this.pos.y, this.suitoffsetx, this.pos.y + this.suitoffsetx)
                 var ret = `
                     position: absolute;
                     top: ${this.pos.y + this.suitoffsety}mm;
@@ -131,7 +154,6 @@ export default {
                 return arg != undefined;
             };
             if (this.pos && chk(this.letteroffsetx) && chk(this.letteroffsety) && chk(this.letterheight)) {
-                console.log(this.pos.y, this.suitoffsetx, this.pos.y + this.suitoffsetx)
                 var ret = `
                     position: absolute;
                     top: ${this.pos.y + this.suitoffsety - this.letterheight}mm;
@@ -142,7 +164,6 @@ export default {
                 `
                 return ret;
             } else {
-                console.log("Did not create top letter style")
                 return ""
             }
         },
@@ -151,7 +172,6 @@ export default {
                 return arg != undefined;
             };
             if (this.pos && chk(this.letteroffsetx) && chk(this.letteroffsety) && chk(this.letterheight)) {
-                console.log(this.pos.y, this.suitoffsetx, this.pos.y + this.suitoffsetx)
                 var ret = `
                     position: absolute;
                     top: ${this.pos.y + this.height - this.suitoffsety}mm;
@@ -174,7 +194,6 @@ export default {
                     left: ${this.pos.x + this.width - this.suitWidth - this.suitoffsetx}mm;
                     rotate: 180deg;
                 `
-                console.log(ret);
                 return ret;
             } else {
                 return ""
@@ -183,19 +202,29 @@ export default {
         position() {
             return this.getAbsPos(document.getElementById('card-' + this.unique));
         },
+        numberBoxX() {
+            var ret = this.pos.x + (this.width - this.numberboxwidth)/2;
+            console.log(ret, this.pos.x, this.width, this.numberboxwidth);
+            return ret;
+        },
+        numberBoxY() {
+            return this.pos.y + (this.height - this.numberboxheight)/2;
+        },
         getSuitImageLocationTop() {
             return {
                 x: this.pos.x + this.suitoffset.x,
                 y: this.pos.y + this.suitoffset.y
             }
-        }
+        },
+        isFace() {
+            return this.value == 'Q' || this.value == 'K' || this.value == 'J' || this.value == 'Joker';
+        },
     },
     created() {
         this.unique = uid;
         uid++
     },
     mounted() {
-        console.log(this.position());
         this.pos = this.position();
     },
     watch: {

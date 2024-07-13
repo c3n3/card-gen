@@ -6,7 +6,8 @@
         <div class="suits">
           <div v-for="suit in suits" v-bind:key="suit">
             <div class="card-holder">
-              <Card :suitimage="image"
+              <Card
+              :suitimage="suitimages[suit]"
               :width="63.5"
               :height="88.9"
               :value="card"
@@ -15,6 +16,9 @@
               :letteroffsetx="0"
               :letteroffsety="0"
               :letterheight="5"
+              :numberboxheight="40"
+              :numberboxwidth="30"
+              :numberscale="numberscale"
               :backimage="getBackgroundImage(card, suit)"
               :color="suitToColor(suit)"></Card>
             </div>
@@ -23,6 +27,10 @@
       </div>
     </div>
     <div class="settings-container">
+      <div class="slidecontainer">
+        <input type="range" min="0" max="3" step="0.01" v-model="numberscale">
+        {{ numberscale }}
+      </div>
       <div class="slidecontainer">
         <input type="range" min="1" max="20" step="0.01" v-model="suitoffsetx">
         {{ suitoffsetx }}
@@ -35,12 +43,16 @@
       </div>
       Suit
       <div v-for="card in cards" v-bind:key="card">
-        <div v-if="card == 'k' || card == 'Q' || card == 'J'">
+        <div v-if="card == 'K' || card == 'Q' || card == 'J'">
           <div v-for="suit in suits" v-bind:key="suit">
             {{ suit }} {{ card }}
             <input :id="'test'+0" type="file" @change="onFileChange($event, card, suit)">
           </div>
         </div>
+      </div>
+      <div v-for="suit in suits" v-bind:key="suit + 'suit'">
+        {{ suit }} image
+        <input :id="'test'+0" type="file" @change="onFileChangeSuit($event, suit)">
       </div>
       Background
       <input :id="'test'+0" type="file" @change="cardbackgroundChange($event)">
@@ -82,19 +94,19 @@ export default {
       image: undefined,
       cardbackground: undefined,
       cards: [
-        'A',
-        '2',
-        '3',
-        '4',
-        '5',
+        // 'A',
+        // '2',
+        // '3',
+        // '4',
+        // '5',
         '6',
         '7',
-        '8',
-        '9',
+        // '8',
+        // '9',
         '10',
-        'J',
-        'Q',
-        'K',
+        // 'J',
+        // 'Q',
+        // 'K',
       ],
       suits: [
         'Spades',
@@ -103,9 +115,16 @@ export default {
         'Diamonds',
       ],
       i:'',
+      numberscale: 1,
       imageplace: 0,
       suitoffsetx: '1', // String just because range creates a string
       suitoffsety: '5', // String just because range creates a string
+      suitimages: {
+        "Spades": undefined,
+        "Clubs": undefined,
+        "Hearts": undefined,
+        "Diamonds": undefined,
+      },
       images: {
         'A': {
           "Spades": undefined,
@@ -205,7 +224,13 @@ export default {
       if (!files.length)
         return;
       this.images[card][suit] = URL.createObjectURL(files[0]);
-      console.log(this.image)
+      this.$forceUpdate();
+    },
+    onFileChangeSuit(e, suit) {
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length)
+        return;
+      this.suitimages[suit] = URL.createObjectURL(files[0]);
       this.$forceUpdate();
     },
     cardbackgroundChange(e) {
@@ -213,7 +238,6 @@ export default {
       if (!files.length)
         return;
       this.cardbackground = URL.createObjectURL(files[0]);
-      console.log(this.cardbackground)
       this.$forceUpdate();
     },
   }
