@@ -3,10 +3,10 @@
     <div @click="download()" :id="'card-' + unique" :style="physicalStyle()" class="card">
         <div :style="topLetterStyle()">{{ value }}</div>
         <div :style="bottomLetterStyle()">{{ value }}</div>
-        <img :src="suitimage" :width="mmToPx(this.suitWidth)" :height="mmToPx(this.suitWidth)" class="suit" :style="topSuitStyle()"/>
-        <img :src="suitimage" :width="mmToPx(this.suitWidth)" :height="mmToPx(this.suitWidth)" class="suit" :style="bottomSuitStyle()"/>
-        <img :src="backimage" :width="mmToPx(this.width)" :height="mmToPx(this.height)" :style="backimageStyle()"/>
-        <Numbers :x="numberBoxX()" :y="numberBoxY()" :suitimage="suitimage" :number="value" :width="numberboxwidth" :height="numberboxheight" :imagewidth="this.suitWidth * this.numberscale"></Numbers>
+        <!-- <img :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="topSuitStyle()"/> -->
+        <!-- <img :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="bottomSuitStyle()"/> -->
+        <!-- <img :src="backimage" :width="mmToPx(this.width)" :height="mmToPx(this.height)" :style="backimageStyle()"/> -->
+        <!-- <Numbers :x="numberBoxX()" :y="numberBoxY()" :suitimage="suitimage" :number="value" :width="numberboxwidth" :height="numberboxheight" :imagewidth="this.suitwidth * this.numberscale"></Numbers> -->
     </div>
 </template>
 <style scoped>
@@ -62,13 +62,14 @@ export default {
         "numberscale",
 
         "acescale",
+
+        "suitwidth",
     ],
     data() {
         return {
             scale: 1.0294,
             unique: 1,
             pos: {x: 0, y: 0},
-            suitWidth: 10,
         }
     },
     methods: {
@@ -81,9 +82,9 @@ export default {
         download() {
             var self = this;
             htmlToImage.toPng(document.getElementById('card-' + this.unique),
-                { 'canvasWidth': this.mmToPx(this.width), 'canvasHeight': this.mmToPx(this.height) })
+                { 'canvasWidth': this.mmToPx(this.width) * 4, 'canvasHeight': this.mmToPx(this.height) * 4 })
                 .then(function (dataUrl) {
-                    (download)(dataUrl, 'card-' + '-' + self.unique + '-' + '.png');
+                    (download)(dataUrl, 'card-' + self.unique + '.png');
                 })
                 .catch(function (error) {
                     console.error('oops, something went wrong!', error);
@@ -126,7 +127,7 @@ export default {
             };
         },
         backimageStyle() {
-            if (this.pos) {
+            if (this.pos && this.backimage) {
                 var ret = `
                     position: absolute;
                     top: ${this.pos.y}mm;
@@ -134,19 +135,19 @@ export default {
                 `
                 return ret;
             } else {
-                return ""
+                return "display: none;"
             }
         },
         topSuitStyle() {
-            if (this.pos && this.suitoffsetx && this.suitoffsety) {
+            if (this.pos && this.suitoffsetx && this.suitoffsety && this.suitimage) {
                 var ret = `
                     position: absolute;
-                    top: ${this.pos.y + this.suitoffsety}mm;
-                    left: ${this.pos.x + this.suitoffsetx}mm;
+                    top: ${this.pos.y + this.suitoffsety - this.suitwidth/2}mm;
+                    left: ${this.pos.x + this.suitoffsetx - this.suitwidth/2}mm;
                 `
                 return ret;
             } else {
-                return ""
+                return "display: none;"
             }
         },
         topLetterStyle() {
@@ -156,11 +157,11 @@ export default {
             if (this.pos && chk(this.letteroffsetx) && chk(this.letteroffsety) && chk(this.letterheight)) {
                 var ret = `
                     position: absolute;
-                    top: ${this.pos.y + this.suitoffsety - this.letterheight}mm;
-                    left: ${this.pos.x + this.suitoffsetx}mm;
+                    top: ${this.pos.y + this.suitoffsety - this.letterheight - this.suitwidth/2}mm;
+                    left: ${this.pos.x + this.suitoffsetx - this.suitwidth/2}mm;
                     font-size: ${this.letterheight}mm;
                     height: ${this.letterheight}mm;
-                    width: ${this.suitWidth}mm;
+                    width: ${this.suitwidth}mm;
                 `
                 return ret;
             } else {
@@ -174,11 +175,11 @@ export default {
             if (this.pos && chk(this.letteroffsetx) && chk(this.letteroffsety) && chk(this.letterheight)) {
                 var ret = `
                     position: absolute;
-                    top: ${this.pos.y + this.height - this.suitoffsety}mm;
-                    left: ${this.pos.x + this.width - this.suitWidth - this.suitoffsetx}mm;
+                    top: ${this.pos.y + this.height - this.suitoffsety + this.suitwidth/2}mm;
+                    left: ${this.pos.x + this.width - this.suitwidth/2 - this.suitoffsetx}mm;
                     font-size: ${this.letterheight}mm;
                     height: ${this.letterheight}mm;
-                    width: ${this.suitWidth}mm;
+                    width: ${this.suitwidth}mm;
                     rotate: 180deg
                 `
                 return ret;
@@ -187,16 +188,16 @@ export default {
             }
         },
         bottomSuitStyle() {
-            if (this.pos != undefined && this.suitoffsetx != undefined && this.suitoffsety != undefined) {
+            if (this.pos != undefined && this.suitoffsetx != undefined && this.suitoffsety != undefined && this.suitimage) {
                 var ret = `
                     position: absolute;
-                    top: ${this.pos.y + this.height - this.suitWidth - this.suitoffsety}mm;
-                    left: ${this.pos.x + this.width - this.suitWidth - this.suitoffsetx}mm;
+                    top: ${this.pos.y + this.height - this.suitwidth/2 - this.suitoffsety}mm;
+                    left: ${this.pos.x + this.width - this.suitwidth/2 - this.suitoffsetx}mm;
                     rotate: 180deg;
                 `
                 return ret;
             } else {
-                return ""
+                return "display: none;"
             }
         },
         position() {

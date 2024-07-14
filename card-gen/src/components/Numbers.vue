@@ -2,7 +2,12 @@
 <template>
     <div class="surround" :style="getBox()">
         <div v-for="i in 11" v-bind:key="i + number">
-            <img :id="number + i + x + y" :src="suitimage" :width="mmToPx(this.imagewidth)" :height="mmToPx(this.imagewidth)" class="suit" :style="getNumberStyle(i-1)"/>
+            <img :id="number + i + x + y"
+                 :src="suitimage"
+                 :width="mmToPx(this.imagewidth)"
+                 :height="mmToPx(this.imagewidth)"
+                 class="suit"
+                 :style="getNumberStyle(i-1)"/>
         </div>
     </div>
 </template>
@@ -18,81 +23,84 @@
 // These are all done by percents
 // They will be translated by the card directly
 var nums = {
+    'A': [
+        {x: 0.5, y: 0.5, r: 0}
+    ],
     2: [
-        {x: 0.5, y: 0},
-        {x: 0.5, y: 1},       
+        {x: 0.5, y: 0, r: 0},
+        {x: 0.5, y: 1, r: 180},       
     ],
     3: [
-        {x: 0.5, y: 0},
-        {x: 0.5, y: 0.5},
-        {x: 0.5, y: 1},
+        {x: 0.5, y: 0, r: 0},
+        {x: 0.5, y: 0.5, r: 0},
+        {x: 0.5, y: 1, r: 180},
     ],
     4: [
-        {x: 0, y: 0},
-        {x: 1, y: 0},
-        {x: 0, y: 1},
-        {x: 1, y: 1},
+        {x: 0, y: 0, r: 0},
+        {x: 1, y: 0, r: 0},
+        {x: 0, y: 1, r: 180},
+        {x: 1, y: 1, r: 180},
     ],
     5: [
-        {x: 0, y: 0},
-        {x: 1, y: 0},
-        {x: 0.5, y: 0.5},
-        {x: 0, y: 1},
-        {x: 1, y: 1},
+        {x: 0, y: 0, r: 0},
+        {x: 1, y: 0, r: 0},
+        {x: 0.5, y: 0.5, r: 0},
+        {x: 0, y: 1, r: 180},
+        {x: 1, y: 1, r: 180},
     ],
     6: [
-        {x: 0, y: 0},
-        {x: 1, y: 0},
-        {x: 0, y: 0.5},
-        {x: 1, y: 0.5},
-        {x: 0, y: 1},
-        {x: 1, y: 1},
+        {x: 0, y: 0, r: 0},
+        {x: 1, y: 0, r: 0},
+        {x: 0, y: 0.5, r: 0},
+        {x: 1, y: 0.5, r: 180},
+        {x: 0, y: 1, r: 180},
+        {x: 1, y: 1, r: 180},
     ],
     7: [
-        {x: 0, y: 0},
-        {x: 1, y: 0},
-        {x: 0, y: 0.5},
-        {x: 1, y: 0.5},
-        {x: 0, y: 1},
-        {x: 1, y: 1},
-        {x: 0.5, y: 0.25},
+        {x: 0, y: 0, r: 0},
+        {x: 1, y: 0, r: 0},
+        {x: 0, y: 0.5, r: 0},
+        {x: 1, y: 0.5, r: 180},
+        {x: 0, y: 1, r: 180},
+        {x: 1, y: 1, r: 180},
+        {x: 0.5, y: 0.25, r: 0},
     ],
     8: [
-        {x: 0, y: 0},
-        {x: 1, y: 0},
-        {x: 0, y: 0.5},
-        {x: 1, y: 0.5},
-        {x: 0, y: 1},
-        {x: 1, y: 1},
-        {x: 0.5, y: 0.25},
-        {x: 0.5, y: 0.75},
+        {x: 0, y: 0, r: 0},
+        {x: 1, y: 0, r: 0},
+        {x: 0, y: 0.5, r: 0},
+        {x: 1, y: 0.5, r: 180},
+        {x: 0, y: 1, r: 180},
+        {x: 1, y: 1, r: 180},
+        {x: 0.5, y: 0.25, r: 0},
+        {x: 0.5, y: 0.75, r: 180},
     ],
     9: [
-        {x: 0, y: 0},
-        {x: 0, y: 0.33},
-        {x: 0, y: 0.66},
-        {x: 0, y: 1},
+        {x: 0, y: 0, r: 0},
+        {x: 0, y: 0.33, r: 0},
+        {x: 0, y: 0.66, r: 180},
+        {x: 0, y: 1, r: 180},
 
-        {x: 1, y: 0},
-        {x: 1, y: 0.33},
-        {x: 1, y: 0.66},
-        {x: 1, y: 1},
+        {x: 1, y: 0, r: 0},
+        {x: 1, y: 0.33, r: 0},
+        {x: 1, y: 0.66, r: 180},
+        {x: 1, y: 1, r: 180},
 
-        {x: 0.5, y: 0.5},
+        {x: 0.5, y: 0.5, r: 0},
     ],
     10: [
-        {x: 0, y: 0},
-        {x: 0, y: 0.33},
-        {x: 0, y: 0.66},
-        {x: 0, y: 1},
+        {x: 0, y: 0, r: 0},
+        {x: 0, y: 0.33, r: 0},
+        {x: 0, y: 0.66, r: 180},
+        {x: 0, y: 1, r: 180},
 
-        {x: 1, y: 0},
-        {x: 1, y: 0.33},
-        {x: 1, y: 0.66},
-        {x: 1, y: 1},
+        {x: 1, y: 0, r: 0},
+        {x: 1, y: 0.33, r: 0},
+        {x: 1, y: 0.66, r: 180},
+        {x: 1, y: 1, r: 180},
 
-        {x: 0.5, y: 0.33/2},
-        {x: 0.5, y: 1-0.3/2},
+        {x: 0.5, y: 0.33/2, r: 0},
+        {x: 0.5, y: 1-0.3/2, r: 180},
     ],
 }
 
@@ -141,7 +149,7 @@ export default {
             }
         },
         getNumberStyle(num) {
-            if (!num in nums) {
+            if (!num in nums || !this.suitimage) {
                 return "display: none;";
             }
             var placements = nums[this.number];
@@ -156,8 +164,8 @@ export default {
                 position: absolute;
                 top: ${pos.y}mm;
                 left: ${pos.x}mm;
+                rotate: ${placements[num].r}deg;
             `;
-            console.log(ret);
             return ret;
         },
         getBox() {

@@ -1,6 +1,5 @@
 <template>
   <div class="main">
-    Hello
     <div class="cards">
       <div v-for="card in cards" v-bind:key="card">
         <div class="suits">
@@ -11,14 +10,15 @@
               :width="63.5"
               :height="88.9"
               :value="card"
-              :suitoffsetx="Number.parseFloat(suitoffsetx)"
-              :suitoffsety="Number.parseFloat(suitoffsety)"
+              :suitoffsetx="Number.parseFloat(parameters.suitoffsetx.value)"
+              :suitoffsety="Number.parseFloat(parameters.suitoffsety.value)"
               :letteroffsetx="0"
               :letteroffsety="0"
-              :letterheight="5"
-              :numberboxheight="40"
-              :numberboxwidth="30"
-              :numberscale="numberscale"
+              :letterheight="parameters.fontsize.value"
+              :suitwidth="parameters.suitwidth.value"
+              :numberboxheight="parameters.numberboxheight.value"
+              :numberboxwidth="parameters.numberboxwidth.value"
+              :numberscale="card == 'A' ? parameters.acescale.value : parameters.numberscale.value"
               :backimage="getBackgroundImage(card, suit)"
               :color="suitToColor(suit)"></Card>
             </div>
@@ -27,18 +27,12 @@
       </div>
     </div>
     <div class="settings-container">
-      <div class="slidecontainer">
-        <input type="range" min="0" max="3" step="0.01" v-model="numberscale">
-        {{ numberscale }}
-      </div>
-      <div class="slidecontainer">
-        <input type="range" min="1" max="20" step="0.01" v-model="suitoffsetx">
-        {{ suitoffsetx }}
-      </div>
-      <div>
-        <div class="slidecontainer">
-          <input type="range" min="5" max="20" step="0.01" v-model="suitoffsety">
-          {{ suitoffsety }}
+      <div class="parameters">
+        <div v-for="obj in parameters" v-bind:key="obj.name">
+          <label>
+            {{ obj.name }}: 
+          </label>
+          <input type="number" v-model="obj.value" class="number-parameter">
         </div>
       </div>
       Suit
@@ -61,10 +55,23 @@
 </template>
 
 <style>
+
+.number-parameter::-webkit-outer-spin-button,
+.number-parameter::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.parameters {
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: start;
+}
 .main {
   display: flex;
 }
 .settings-container {
+  margin-left: 10mm;
 
 }
 .cards {
@@ -94,7 +101,7 @@ export default {
       image: undefined,
       cardbackground: undefined,
       cards: [
-        // 'A',
+        'A',
         '2',
         '3',
         '4',
@@ -115,8 +122,17 @@ export default {
         'Diamonds',
       ],
       i:'',
+      parameters: {
+        numberscale: {value: 2.26, name: 'Number scale'},
+        suitoffsetx: {value: 5.3, name: "Corner suit offset x"},
+        suitoffsety: {value: 18, name: "Corner suit offset y"},
+        numberboxwidth: {value: 30, name: "Number box width"},
+        numberboxheight: {value: 55, name: "Number box height"},
+        acescale:    {value: 2.5, name: "Ace scale"},
+        suitwidth:    {value: 7.5, name: "Smallest suit image size"},
+        fontsize:    {value: 8.8, name: "Font size"},
+      },
       numberscale: 1,
-      imageplace: 0,
       suitoffsetx: '1', // String just because range creates a string
       suitoffsety: '5', // String just because range creates a string
       suitimages: {
