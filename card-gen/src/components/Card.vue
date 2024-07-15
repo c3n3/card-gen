@@ -65,6 +65,8 @@ export default {
         "acescale",
 
         "suitwidth",
+
+        "output"
     ],
     data() {
         return {
@@ -83,7 +85,7 @@ export default {
         download() {
             var self = this;
             htmlToImage.toPng(document.getElementById('card-' + this.unique),
-                { 'canvasWidth': this.mmToPx(this.width) * 4, 'canvasHeight': this.mmToPx(this.height) * 4 })
+                { 'canvasWidth': this.mmToPx(this.width) * 5, 'canvasHeight': this.mmToPx(this.height) * 5 })
                 .then(function (dataUrl) {
                     (download)(dataUrl, 'card-' + self.unique + '.png');
                 })
@@ -131,8 +133,8 @@ export default {
             if (this.pos && this.backimage) {
                 var ret = `
                     position: absolute;
-                    top: ${this.pos.y}mm;
-                    left: ${this.pos.x}mm;
+                    top: 0mm;
+                    left: 0mm;
                 `
                 return ret;
             } else {
