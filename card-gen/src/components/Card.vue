@@ -3,15 +3,16 @@
     <div @click="download()" :id="'card-' + unique" :style="physicalStyle()" class="card">
         <div :style="topLetterStyle()">{{ value }}</div>
         <div :style="bottomLetterStyle()">{{ value }}</div>
-        <!-- <img :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="topSuitStyle()"/> -->
-        <!-- <img :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="bottomSuitStyle()"/> -->
-        <!-- <img :src="backimage" :width="mmToPx(this.width)" :height="mmToPx(this.height)" :style="backimageStyle()"/> -->
-        <!-- <Numbers :x="numberBoxX()" :y="numberBoxY()" :suitimage="suitimage" :number="value" :width="numberboxwidth" :height="numberboxheight" :imagewidth="this.suitwidth * this.numberscale"></Numbers> -->
+        <img v-if="suitimage" :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="topSuitStyle()"/>
+        <img v-if="suitimage" :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="bottomSuitStyle()"/>
+        <img v-if="backimage" :src="backimage" :width="mmToPx(this.width)" :height="mmToPx(this.height)" :style="backimageStyle()"/>
+        <Numbers :x="numberBoxX()" :y="numberBoxY()" :suitimage="suitimage" :number="value" :width="numberboxwidth" :height="numberboxheight" :imagewidth="this.suitwidth * this.numberscale"></Numbers>
     </div>
 </template>
 <style scoped>
 .card {
     font-family: "Comic Sans MS", "Comic Sans", cursive;
+    position: relative;
 }
 .card :hover {
     cursor: pointer;
@@ -142,8 +143,8 @@ export default {
             if (this.pos && this.suitoffsetx && this.suitoffsety && this.suitimage) {
                 var ret = `
                     position: absolute;
-                    top: ${this.pos.y + this.suitoffsety - this.suitwidth/2}mm;
-                    left: ${this.pos.x + this.suitoffsetx - this.suitwidth/2}mm;
+                    top: ${this.suitoffsety - this.suitwidth/2}mm;
+                    left: ${this.suitoffsetx - this.suitwidth/2}mm;
                 `
                 return ret;
             } else {
@@ -157,8 +158,8 @@ export default {
             if (this.pos && chk(this.letteroffsetx) && chk(this.letteroffsety) && chk(this.letterheight)) {
                 var ret = `
                     position: absolute;
-                    top: ${this.pos.y + this.suitoffsety - this.letterheight - this.suitwidth/2}mm;
-                    left: ${this.pos.x + this.suitoffsetx - this.suitwidth/2}mm;
+                    top: ${this.suitoffsety - this.letterheight - this.suitwidth/2}mm;
+                    left: ${this.suitoffsetx - this.suitwidth/2}mm;
                     font-size: ${this.letterheight}mm;
                     height: ${this.letterheight}mm;
                     width: ${this.suitwidth}mm;
@@ -175,8 +176,8 @@ export default {
             if (this.pos && chk(this.letteroffsetx) && chk(this.letteroffsety) && chk(this.letterheight)) {
                 var ret = `
                     position: absolute;
-                    top: ${this.pos.y + this.height - this.suitoffsety + this.suitwidth/2}mm;
-                    left: ${this.pos.x + this.width - this.suitwidth/2 - this.suitoffsetx}mm;
+                    top: ${this.height - this.suitoffsety + this.suitwidth/2}mm;
+                    left: ${this.width - this.suitwidth/2 - this.suitoffsetx}mm;
                     font-size: ${this.letterheight}mm;
                     height: ${this.letterheight}mm;
                     width: ${this.suitwidth}mm;
@@ -191,8 +192,8 @@ export default {
             if (this.pos != undefined && this.suitoffsetx != undefined && this.suitoffsety != undefined && this.suitimage) {
                 var ret = `
                     position: absolute;
-                    top: ${this.pos.y + this.height - this.suitwidth/2 - this.suitoffsety}mm;
-                    left: ${this.pos.x + this.width - this.suitwidth/2 - this.suitoffsetx}mm;
+                    top: ${this.height - this.suitwidth/2 - this.suitoffsety}mm;
+                    left: ${this.width - this.suitwidth/2 - this.suitoffsetx}mm;
                     rotate: 180deg;
                 `
                 return ret;
@@ -204,11 +205,11 @@ export default {
             return this.getAbsPos(document.getElementById('card-' + this.unique));
         },
         numberBoxX() {
-            var ret = this.pos.x + (this.width - this.numberboxwidth)/2;
+            var ret = (this.width - this.numberboxwidth)/2;
             return ret;
         },
         numberBoxY() {
-            return this.pos.y + (this.height - this.numberboxheight)/2;
+            return (this.height - this.numberboxheight)/2;
         },
         getSuitImageLocationTop() {
             return {

@@ -3,6 +3,7 @@
     <div class="surround" :style="getBox()">
         <div v-for="i in 11" v-bind:key="i + number">
             <img :id="number + i + x + y"
+                 v-if="suitimage"
                  :src="suitimage"
                  :width="mmToPx(this.imagewidth)"
                  :height="mmToPx(this.imagewidth)"
@@ -15,7 +16,7 @@
 <style scoped>
 .surround {
     /* border: 1px solid black; */
-    position: absolute;
+    position: relative;
 }
 </style>
 <script>
