@@ -36,9 +36,9 @@ jobs:
           node-version: 18
           cache: 'npm'
       - name: Install dependencies
-        run: cd code-gen && npm install
+        run: cd card-gen && npm install
       - name: Build
-        run: cd code-gen; npm run build
+        run: cd card-gen; npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
