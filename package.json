@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite",
+    "preview": "vite preview",
     "serve": "vue-cli-service serve",
     "build2": "run-p type-check build-only",
     "build": "vue-cli-service build",
