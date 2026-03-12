@@ -6,12 +6,11 @@
         <img v-if="suitimage" :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="topSuitStyle()"/>
         <img v-if="suitimage" :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="bottomSuitStyle()"/>
         <img v-if="backimage" :src="backimage" :width="mmToPx(this.width)" :height="mmToPx(this.height)" :style="backimageStyle()"/>
-        <Numbers :x="numberBoxX()" :y="numberBoxY()" :suitimage="suitimage" :number="value" :width="numberboxwidth" :height="numberboxheight" :imagewidth="this.suitwidth * this.numberscale"></Numbers>
+        <Numbers :x="numberBoxX()" :y="numberBoxY()" :suitimage="suitimageInner || suitimage" :number="value" :width="numberboxwidth" :height="numberboxheight" :imagewidth="this.suitwidth * this.numberscale"></Numbers>
     </div>
 </template>
 <style scoped>
 .card {
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
     position: relative;
 }
 .card :hover {
@@ -48,6 +47,8 @@ export default {
         'height',
         'width',
         'suitimage',
+        'suitimageOuter',
+        'suitimageInner',
         'backimage',
         'suitoffsetx',
         'suitoffsety',
@@ -66,6 +67,8 @@ export default {
 
         "suitwidth",
 
+        "fontFamily",
+
         "output"
     ],
     data() {
@@ -77,9 +80,11 @@ export default {
     },
     methods: {
         physicalStyle() {
+            var font = this.fontFamily || '"Comic Sans MS", "Comic Sans", cursive';
             return `width: ${this.width}mm;
                     height: ${this.height}mm;
                     color: ${this.color};
+                    font-family: ${font};
         `
         },
         download() {

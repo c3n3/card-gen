@@ -6,7 +6,9 @@
           <div v-for="suit in suits" v-bind:key="suit">
             <div class="card-holder">
               <Card
-              :suitimage="suitimages[suit]"
+              :suitimageOuter="suitimagesOuter[suit] || suitimages[suit]"
+              :suitimageInner="suitimagesInner[suit] || suitimages[suit]"
+              :suitimage="suitimagesOuter[suit] || suitimages[suit]"
               :width="63.5"
               :height="88.9"
               :value="card"
@@ -21,6 +23,7 @@
               :numberscale="card == 'A' ? parameters.acescale.value : parameters.numberscale.value"
               :backimage="getBackgroundImage(card, suit)"
               :color="suitToColor(suit)"
+              :fontFamily="selectedFont"
               :output="shouldDownload"></Card>
             </div>
           </div>
@@ -39,6 +42,7 @@
           :height="88.9"
           :backimage="joker_1"
           :color="'black'"
+          :fontFamily="selectedFont"
           :output="shouldDownload">
         </Card>
       </div>
@@ -55,28 +59,57 @@
           :height="88.9"
           :color="'red'"
           :backimage="joker_2"
+          :fontFamily="selectedFont"
           :output="shouldDownload">
       </Card>
       </div>
     </div>
     <div class="settings-container">
       <input class="download-button" type="button" value="DOWNLOAD ALL" @click="downloadAll()">
+
+      <!-- Font selection -->
+      <div class="font-section">
+        <h3>Font</h3>
+        <label>Font family: </label>
+        <select v-model="selectedFont" class="font-select">
+          <option v-for="font in availableFonts" :key="font" :value="font" :style="{ fontFamily: font }">{{ font }}</option>
+        </select>
+        <br>
+        <label>Upload TTF font: </label>
+        <input type="file" accept=".ttf,.otf,.woff,.woff2" @change="onFontUpload($event)">
+      </div>
+
+      <!-- Parameters with sliders -->
       <div class="parameters">
-        <div v-for="obj in parameters" v-bind:key="obj.name">
-          <label>
-            {{ obj.name }}: 
-          </label>
-          <input type="number" v-model="obj.value" class="number-parameter">
+        <div v-for="(obj, key) in parameters" v-bind:key="obj.name" class="parameter-row">
+          <label>{{ obj.name }}: </label>
+          <template v-if="obj.type === 'number'">
+            <input type="range"
+              :min="obj.default * 0.5"
+              :max="obj.default * 1.5"
+              :step="obj.default * 0.01"
+              v-model.number="obj.value"
+              class="parameter-slider">
+            <input type="number" v-model="obj.value" class="number-parameter" :step="obj.default * 0.01">
+          </template>
+          <template v-else-if="obj.type === 'checkbox'">
+            <input type="checkbox" v-model="obj.value">
+          </template>
+          <template v-else>
+            <input type="text" v-model="obj.value">
+          </template>
         </div>
       </div>
       <br>
       <div class="file-upload">
         <h3>Upload folder with the following files:</h3>
         <ul class="instruction-list">
-          <li>spade.png</li>
-          <li>club.png</li>
-          <li>heart.png</li>
-          <li>diamond.png</li>
+          <li>spade.png (used for both inner &amp; outer)</li>
+          <li>spade_inner.png (optional, inner only)</li>
+          <li>spade_outer.png (optional, outer only)</li>
+          <li>club.png / club_inner.png / club_outer.png</li>
+          <li>heart.png / heart_inner.png / heart_outer.png</li>
+          <li>diamond.png / diamond_inner.png / diamond_outer.png</li>
 
           <li>king_spade.png</li>
           <li>king_club.png</li>
@@ -95,16 +128,20 @@
         </ul>
         <input type="file" webkitdirectory mozdirectory @change="onFolderChange($event)">
       </div>
-      <!-- <div v-for="card in cards" v-bind:key="card">
-        <div v-if="card == 'K' || card == 'Q' || card == 'J'">
-          <div v-for="suit in suits" v-bind:key="suit">
-            {{ suit }} {{ card }}
-          </div>
+      <div v-for="suit in suits" v-bind:key="suit + 'suit'" class="suit-upload-section">
+        <strong>{{ suit }}</strong>
+        <div>
+          {{ suit }} image (both)
+          <input type="file" @change="onFileChangeSuit($event, suit)">
         </div>
-      </div> -->
-      <div v-for="suit in suits" v-bind:key="suit + 'suit'">
-        {{ suit }} image
-        <input :id="'test'+0" type="file" @change="onFileChangeSuit($event, suit)">
+        <div>
+          {{ suit }} outer image
+          <input type="file" @change="onFileChangeSuitOuter($event, suit)">
+        </div>
+        <div>
+          {{ suit }} inner image
+          <input type="file" @change="onFileChangeSuitInner($event, suit)">
+        </div>
       </div>
     </div>
   </div>
@@ -128,18 +165,43 @@
   -webkit-appearance: none;
   margin: 0;
 }
+.number-parameter {
+  width: 80px;
+}
 .parameters {
   display: flex;
   flex-direction: column;
   justify-content: left;
   align-items: start;
 }
+.parameter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.parameter-slider {
+  width: 120px;
+}
+.font-section {
+  text-align: left;
+  margin-bottom: 10px;
+}
+.font-select {
+  margin-left: 4px;
+  padding: 2px 4px;
+}
+.suit-upload-section {
+  text-align: left;
+  margin-top: 8px;
+  padding: 4px 0;
+  border-bottom: 1px solid #ccc;
+}
 .main {
   display: flex;
 }
 .settings-container {
   margin-left: 10mm;
-
 }
 .cards {
   display: flex;
@@ -195,19 +257,47 @@ export default {
       ],
       i:'',
       shouldDownload: false,
+      selectedFont: 'Comic Sans MS',
+      availableFonts: [
+        'Comic Sans MS',
+        'Arial',
+        'Times New Roman',
+        'Georgia',
+        'Courier New',
+        'Verdana',
+        'Impact',
+        'Trebuchet MS',
+        'Palatino Linotype',
+        'Lucida Console',
+        'Tahoma',
+        'Garamond',
+      ],
+      uploadedFontCount: 0,
       parameters: {
-        numberscale: {value: 2.26, name: 'Number scale'},
-        suitoffsetx: {value: 9, name: "Corner suit offset x"},
-        suitoffsety: {value: 18, name: "Corner suit offset y"},
-        numberboxwidth: {value: 26, name: "Number box width"},
-        numberboxheight: {value: 52, name: "Number box height"},
-        acescale:    {value: 2.5, name: "Ace scale"},
-        suitwidth:    {value: 7.5, name: "Smallest suit image size"},
-        fontsize:    {value: 8.8, name: "Font size"},
+        numberscale: {value: 2.26, default: 2.26, name: 'Number scale', type: 'number'},
+        suitoffsetx: {value: 9, default: 9, name: "Corner suit offset x", type: 'number'},
+        suitoffsety: {value: 18, default: 18, name: "Corner suit offset y", type: 'number'},
+        numberboxwidth: {value: 26, default: 26, name: "Number box width", type: 'number'},
+        numberboxheight: {value: 52, default: 52, name: "Number box height", type: 'number'},
+        acescale:    {value: 2.5, default: 2.5, name: "Ace scale", type: 'number'},
+        suitwidth:    {value: 7.5, default: 7.5, name: "Smallest suit image size", type: 'number'},
+        fontsize:    {value: 8.8, default: 8.8, name: "Font size", type: 'number'},
       },
       joker_1: undefined,
       joker_2: undefined,
       suitimages: {
+        "Spades": undefined,
+        "Clubs": undefined,
+        "Hearts": undefined,
+        "Diamonds": undefined,
+      },
+      suitimagesInner: {
+        "Spades": undefined,
+        "Clubs": undefined,
+        "Hearts": undefined,
+        "Diamonds": undefined,
+      },
+      suitimagesOuter: {
         "Spades": undefined,
         "Clubs": undefined,
         "Hearts": undefined,
@@ -318,13 +408,27 @@ export default {
         var vals = file.name.split("_");
         console.log(vals);
         if (vals.length < 2) {
+          // Single name like spade.png -> goes to both inner and outer
           var suit = file.name.split(".")[0];
           suit = suit.charAt(0).toUpperCase() + suit.slice(1).toLowerCase();
           if (suit.charAt(suit.length-1) != "s") {
             suit = suit + "s";
           }
-          console.log("Result", suit, card)
+          console.log("Result suit (both)", suit)
           this.suitimages[suit] = URL.createObjectURL(file);
+        } else if (vals.length == 2 && (vals[1].split(".")[0].toLowerCase() === "inner" || vals[1].split(".")[0].toLowerCase() === "outer")) {
+          // e.g. spade_inner.png or spade_outer.png
+          var suitName = vals[0].charAt(0).toUpperCase() + vals[0].slice(1).toLowerCase();
+          if (suitName.charAt(suitName.length-1) != "s") {
+            suitName = suitName + "s";
+          }
+          var variant = vals[1].split(".")[0].toLowerCase();
+          if (variant === "inner") {
+            this.suitimagesInner[suitName] = URL.createObjectURL(file);
+          } else {
+            this.suitimagesOuter[suitName] = URL.createObjectURL(file);
+          }
+          console.log("Result suit " + variant, suitName)
         } else if (!vals[0].toLowerCase().includes("joker")) {
           var card = vals[0].charAt(0).toUpperCase();
           var suit = vals[1].split(".")[0];
@@ -360,6 +464,38 @@ export default {
       this.suitimages[suit] = URL.createObjectURL(files[0]);
       console.log(files[0])
       this.$forceUpdate();
+    },
+    onFileChangeSuitOuter(e, suit) {
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length)
+        return;
+      this.suitimagesOuter[suit] = URL.createObjectURL(files[0]);
+      this.$forceUpdate();
+    },
+    onFileChangeSuitInner(e, suit) {
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length)
+        return;
+      this.suitimagesInner[suit] = URL.createObjectURL(files[0]);
+      this.$forceUpdate();
+    },
+    onFontUpload(e) {
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length)
+        return;
+      var file = files[0];
+      var fontName = file.name.replace(/\.[^/.]+$/, "");
+      this.uploadedFontCount++;
+      var fontFace = new FontFace(fontName, `url(${URL.createObjectURL(file)})`);
+      fontFace.load().then((loadedFace) => {
+        document.fonts.add(loadedFace);
+        if (!this.availableFonts.includes(fontName)) {
+          this.availableFonts.push(fontName);
+        }
+        this.selectedFont = fontName;
+      }).catch((err) => {
+        console.error("Failed to load font:", err);
+      });
     },
     cardbackgroundChange(e) {
       var files = e.target.files || e.dataTransfer.files;
