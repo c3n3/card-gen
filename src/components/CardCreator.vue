@@ -14,6 +14,8 @@
               :value="card"
               :suitoffsetx="Number.parseFloat(parameters.suitoffsetx.value)"
               :suitoffsety="Number.parseFloat(parameters.suitoffsety.value)"
+              :cornerimgoffsetx="Number.parseFloat(parameters.cornerimgoffsetx.value)"
+              :cornerimgoffsety="Number.parseFloat(parameters.cornerimgoffsety.value)"
               :letteroffsetx="0"
               :letteroffsety="0"
               :letterheight="parameters.fontsize.value"
@@ -36,6 +38,8 @@
           :suitwidth="parameters.suitwidth.value"
           :suitoffsetx="Number.parseFloat(parameters.suitoffsetx.value)"
           :suitoffsety="Number.parseFloat(parameters.suitoffsety.value)"
+          :cornerimgoffsetx="Number.parseFloat(parameters.cornerimgoffsetx.value)"
+          :cornerimgoffsety="Number.parseFloat(parameters.cornerimgoffsety.value)"
           :letterheight="parameters.fontsize.value"
           :value="'Joker'"
           :width="63.5"
@@ -53,6 +57,8 @@
           :suitwidth="parameters.suitwidth.value"
           :suitoffsetx="Number.parseFloat(parameters.suitoffsetx.value)"
           :suitoffsety="Number.parseFloat(parameters.suitoffsety.value)"
+          :cornerimgoffsetx="Number.parseFloat(parameters.cornerimgoffsetx.value)"
+          :cornerimgoffsety="Number.parseFloat(parameters.cornerimgoffsety.value)"
           :letterheight="parameters.fontsize.value"
           :value="'Joker'"
           :width="63.5"
@@ -85,12 +91,12 @@
           <label>{{ obj.name }}: </label>
           <template v-if="obj.type === 'number'">
             <input type="range"
-              :min="obj.default * 0.5"
-              :max="obj.default * 1.5"
-              :step="obj.default * 0.01"
+              :min="obj.default === 0 ? -5 : obj.default * 0.1"
+              :max="obj.default === 0 ? 5 : obj.default * 2.0"
+              :step="obj.default === 0 ? 0.1 : obj.default * 0.01"
               v-model.number="obj.value"
               class="parameter-slider">
-            <input type="number" v-model="obj.value" class="number-parameter" :step="obj.default * 0.01">
+            <input type="number" v-model="obj.value" class="number-parameter" :step="obj.default === 0 ? 0.1 : obj.default * 0.01">
           </template>
           <template v-else-if="obj.type === 'checkbox'">
             <input type="checkbox" v-model="obj.value">
@@ -261,6 +267,7 @@ export default {
       availableFonts: [
         'Comic Sans MS',
         'Arial',
+        'Arial Black',
         'Times New Roman',
         'Georgia',
         'Courier New',
@@ -271,6 +278,34 @@ export default {
         'Lucida Console',
         'Tahoma',
         'Garamond',
+        'Book Antiqua',
+        'Bookman Old Style',
+        'Century Gothic',
+        'Copperplate Gothic',
+        'Franklin Gothic Medium',
+        'Gill Sans',
+        'Lucida Sans',
+        'Perpetua',
+        'Rockwell',
+        'Segoe UI',
+        'Cambria',
+        'Candara',
+        'Consolas',
+        'Constantia',
+        'Corbel',
+        'Calibri',
+        'Brush Script MT',
+        'Papyrus',
+        'Wingdings',
+        'Wingdings 2',
+        'Wingdings 3',
+        'Webdings',
+        'Symbol',
+        'MS Gothic',
+        'MS Mincho',
+        'Fixedsys',
+        'Terminal',
+        'System',
       ],
       uploadedFontCount: 0,
       parameters: {
@@ -282,6 +317,8 @@ export default {
         acescale:    {value: 2.5, default: 2.5, name: "Ace scale", type: 'number'},
         suitwidth:    {value: 7.5, default: 7.5, name: "Smallest suit image size", type: 'number'},
         fontsize:    {value: 8.8, default: 8.8, name: "Font size", type: 'number'},
+        cornerimgoffsetx: {value: 0, default: 0, name: "Corner image offset X", type: 'number'},
+        cornerimgoffsety: {value: 0, default: 0, name: "Corner image offset Y", type: 'number'},
       },
       joker_1: undefined,
       joker_2: undefined,

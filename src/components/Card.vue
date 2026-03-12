@@ -6,7 +6,7 @@
         <img v-if="suitimage" :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="topSuitStyle()"/>
         <img v-if="suitimage" :src="suitimage" :width="mmToPx(this.suitwidth)" :height="mmToPx(this.suitwidth)" class="suit" :style="bottomSuitStyle()"/>
         <img v-if="backimage" :src="backimage" :width="mmToPx(this.width)" :height="mmToPx(this.height)" :style="backimageStyle()"/>
-        <Numbers :x="numberBoxX()" :y="numberBoxY()" :suitimage="suitimageInner || suitimage" :number="value" :width="numberboxwidth" :height="numberboxheight" :imagewidth="this.suitwidth * this.numberscale"></Numbers>
+        <Numbers :x="numberBoxX()" :y="numberBoxY()" :suitimage="suitimageInner" :number="value" :width="numberboxwidth" :height="numberboxheight" :imagewidth="this.suitwidth * this.numberscale"></Numbers>
     </div>
 </template>
 <style scoped>
@@ -66,6 +66,9 @@ export default {
         "acescale",
 
         "suitwidth",
+
+        "cornerimgoffsetx",
+        "cornerimgoffsety",
 
         "fontFamily",
 
@@ -148,10 +151,12 @@ export default {
         },
         topSuitStyle() {
             if (this.pos && this.suitoffsetx && this.suitoffsety && this.suitimage) {
+                var offsetX = Number(this.cornerimgoffsetx) || 0;
+                var offsetY = Number(this.cornerimgoffsety) || 0;
                 var ret = `
                     position: absolute;
-                    top: ${this.suitoffsety - this.suitwidth/2}mm;
-                    left: ${this.suitoffsetx - this.suitwidth/2}mm;
+                    top: ${this.suitoffsety - this.suitwidth/2 + offsetY}mm;
+                    left: ${this.suitoffsetx - this.suitwidth/2 + offsetX}mm;
                 `
                 return ret;
             } else {
@@ -197,10 +202,12 @@ export default {
         },
         bottomSuitStyle() {
             if (this.pos != undefined && this.suitoffsetx != undefined && this.suitoffsety != undefined && this.suitimage) {
+                var offsetX = Number(this.cornerimgoffsetx) || 0;
+                var offsetY = Number(this.cornerimgoffsety) || 0;
                 var ret = `
                     position: absolute;
-                    top: ${this.height - this.suitwidth/2 - this.suitoffsety}mm;
-                    left: ${this.width - this.suitwidth/2 - this.suitoffsetx}mm;
+                    top: ${this.height - this.suitwidth/2 - this.suitoffsety - offsetY}mm;
+                    left: ${this.width - this.suitwidth/2 - this.suitoffsetx - offsetX}mm;
                     rotate: 180deg;
                 `
                 return ret;
